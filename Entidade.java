@@ -57,8 +57,12 @@ public class Entidade {
     }
 
     //funcionalidades gerais
-    public int receberDano(int dano) {
-        return 0;
+    public boolean receberDano(int dano){
+        this.vida -= dano;
+        if (this.vida<1){
+            return false;
+        }
+        return true;
     }
 
     public void mover() {
