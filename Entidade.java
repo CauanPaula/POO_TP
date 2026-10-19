@@ -6,9 +6,11 @@ public class Entidade{
     private double pos_x;
     private double pos_y;
     private double cadencia;
+    private double tam_x;
+    private double tam_y; 
 
     //construtor
-    public Entidade(int vida, int dano, double vel_x, double vel_y, double cadencia){
+    public Entidade(int vida, int dano, double vel_x, double vel_y, double cadencia, double tam_x, double tam_y){
         if (vida <1){
             throw new ArgumentException("Valor invalido para vida");
         }
@@ -21,6 +23,12 @@ public class Entidade{
         if (vel_y <0){
             throw new ArgumentException("Valor invalido para velocidade vertical");
         }
+        if (tam_x <0){
+            throw new ArgumentException("Valor invalido para tamanho horizontal");
+        }
+        if (tam_y <0){
+            throw new ArgumentException("Valor invalido para tamanho vertical");
+        }
         if (cadencia <0){
             throw new ArgumentException("Valor invalido para cadencia");
         }
@@ -31,6 +39,8 @@ public class Entidade{
         this.pos_x = 0;
         this.pos_y = 0;
         this.cadencia = cadencia;
+        this.tam_x = tam_x;
+        this.tam_y = tam_y;
     }
 
     //funcoes de get
@@ -55,6 +65,12 @@ public class Entidade{
     public double getVel_y(){
         return this.vel_y;
     }
+    public double getTam_x(){
+        return this.tam_x;
+    }
+    public double getTam_y(){
+        return this.tam_y;
+    }
 
     //funcionalidades gerais
     public boolean receberDano(int dano){
@@ -70,6 +86,12 @@ public class Entidade{
     }
     public void atirar(){
         System.out.println("Aguardar implementacao da classe tiro");
+    }
+    public boolean colisao(double x, double y){
+        if(this.pos_x -this.tam_x <= x && x <= this.pos_x + this.tam_x && this.pos_y -this.tam_y <= y && y <= this.pos_y+ this.tam_y){
+            return  true;
+        }
+        return false;
     }
 
     //funcoes de set

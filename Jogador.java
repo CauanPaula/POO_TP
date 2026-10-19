@@ -1,8 +1,8 @@
 public class Jogador extends Entidade{
     private int tipoDaNave;
     private boolean estaAtirando;
-    public Jogador(int vida, int dano, double vel_x, double vel_y, double cadencia, int tipoDaNave){
-        super(vida, dano, vel_x, vel_y, cadencia);
+    public Jogador(int vida, int dano, double vel_x, double vel_y, double cadencia, int tipoDaNave, double tam_x, double tam_y){
+        super(vida, dano, vel_x, vel_y, cadencia, tam_x, tam_y);
         this.tipoDaNave = tipoDaNave;
         this.estaAtirando = false;
     }
