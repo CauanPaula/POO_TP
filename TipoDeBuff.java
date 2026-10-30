@@ -1,3 +1,4 @@
-public enum TipoDeBuff{
+
+public enum TipoDeBuff {
     VIDA, DANO, CADENCIA
 }
