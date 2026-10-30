@@ -85,10 +85,7 @@ public class Entidade {
     //funcionalidades gerais
     public boolean receberDano(int dano) {
         this.vida -= dano;
-        if (this.vida < 1) {
-            return false;
-        }
-        return true;
+        return this.vida >= 1;
     }
 
     public void mover() {
@@ -101,10 +98,8 @@ public class Entidade {
     }
 
     public boolean colisao(double x, double y) {
-        if (this.pos_x - this.tam_x <= x && x <= this.pos_x + this.tam_x && this.pos_y - this.tam_y <= y && y <= this.pos_y + this.tam_y) {
-            return true;
-        }
-        return false;
+        return this.pos_x - this.tam_x <= x && x <= this.pos_x + this.tam_x
+                && this.pos_y - this.tam_y <= y && y <= this.pos_y + this.tam_y;
     }
 
     //funcoes de set

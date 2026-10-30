@@ -1,7 +1,7 @@
 
 public class Buffing extends Entidade {
 
-    private TipoDeBuff tipoDeBuff;
+    private final TipoDeBuff tipoDeBuff;
 
     public Buffing(int vida, int dano, double vel_x, double vel_y, double cadencia, int tipoInimigo, double tam_x, double tam_y, TipoDeBuff tipoDeBuff) {
         super(vida, dano, vel_x, vel_y, cadencia, tam_x, tam_y);
