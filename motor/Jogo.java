@@ -21,7 +21,7 @@ public class Jogo {
     private Score score;
     private GerenciadorTiros motorTiros;
     private GerenciadorColisoes motorColisoes;
-    private TipoDeNave naveSelecionada;
+    private TipoDeNave naveSelecionada = TipoDeNave.TIP1;
 
     private ArrayList<Inimigo> enemies;
     private ArrayList<Buffing> buffs;
@@ -43,12 +43,15 @@ public class Jogo {
         this.tamanhoTelaY = tamTelaY;
         inicializarJogo();
     }
+    public void setNaveSelecionada(TipoDeNave tipo) {
+        this.naveSelecionada = tipo; 
+    }
 
     public void inicializarJogo(){
-        this.naveSelecionada = TipoDeNave.TIPO1;
 
         //Instanciaçoes
-        this.jogador = new Jogador(3, 2, 6, 6, 1, naveSelecionada.ordinal(), 20, 15);
+        //this.jogador = new Jogador(3, 2, 6, 6, 1, naveSelecionada.ordinal(), 20, 15);
+        this.jogador = new Jogador(naveSelecionada, 20, 15);
         this.jogador.setPos_x(500);
         this.jogador.setPos_y(420);
 

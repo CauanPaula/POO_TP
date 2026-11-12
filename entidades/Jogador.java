@@ -1,18 +1,33 @@
 package entidades;
+
 import motor.GerenciadorTiros;
 import interfaces.Atirador;
+import tipos.TipoDeNave;
 
 public class Jogador extends Entidade implements Atirador {
 
-    private int tipoDaNave;
+
+    private static final int VidaBase = 3;
+    private static final int DanoBase = 2;
+    private static final double VelocidadeBase = 6.0;
+    private static final double CadenciaBase = 1.0;
+
+    private final TipoDeNave tipo;
     private boolean estaAtirando;
 
-    public Jogador(int vida, int dano, double vel_x, double vel_y, double cadencia, int tipoDaNave, double tam_x, double tam_y) {
-        super(vida, dano, vel_x, vel_y, cadencia, tam_x, tam_y);
-        this.tipoDaNave = tipoDaNave;
+    public Jogador(TipoDeNave tipo, double tam_x, double tam_y) {
+        super(Math.max(1, (int) Math.round(VidaBase * tipo.getMultiplicaVida())),
+            Math.max(1, (int) Math.round(DanoBase * tipo.getMultiplicaDano())),
+            VelocidadeBase * tipo.getMultiplicaVelocidade(),
+            VelocidadeBase * tipo.getMultiplicaVelocidade(),
+            CadenciaBase * tipo.getMultiplicaCadencia(),
+            tam_x, tam_y);
+        this.tipo = tipo;
         this.estaAtirando = false;
     }
-
+    public TipoDeNave getTipo() {
+         return this.tipo;
+    }
     public void moverCima() {
         setPos_y(this.getPos_y() - this.getVel_y());
     }
