@@ -11,6 +11,7 @@ import entidades.Buffing;
 import entidades.Inimigo;
 import entidades.Jogador;
 import entidades.Tiro;
+import tipos.TipoDeNave;
 
 public class Cenario extends JPanel implements ActionListener, KeyListener {
 
@@ -19,6 +20,8 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
 
     private int tamanhoTelaX = 800;
     private int tamanhoTelaY = 600;
+
+    private boolean noMenu = true;
 
     public Cenario() {
         setPreferredSize(new Dimension(this.tamanhoTelaX, this.tamanhoTelaY));
@@ -37,6 +40,21 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        
+        if (noMenu) {
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 28));
+            g.drawString("Escolha sua nave", 290, 200);
+            g.setFont(new Font("Arial", Font.BOLD, 18));
+            int y = 260;
+            for (TipoDeNave t : TipoDeNave.values()) {
+                g.drawString((t.ordinal() + 1) + " - " + t.name()
+                    + String.format("  (vida x%.1f, dano x%.1f, vel x%.1f, cad x%.1f)",
+                        t.getMultiplicaVida(), t.getMultiplicaDano(), t.getMultiplicaVelocidade(), t.getMultiplicaCadencia()), 120, y);
+                y += 35;
+            }
+            return;
+        }
 
         if (motorJogo.isGameOver()) {
             g.setColor(Color.RED);
@@ -63,7 +81,12 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         int jLargura = (int) (jogador.getTam_x() * 2);
         int jAltura = (int) (jogador.getTam_y() * 2);
 
-        g.setColor(Color.CYAN);
+        //g.setColor(Color.CYAN);
+        switch (jogador.getTipo()) {
+            case TIP1 -> g.setColor(Color.CYAN);
+            case TIP2 -> g.setColor(Color.PINK);
+            case TIP3 -> g.setColor(Color.LIGHT_GRAY);
+        }
         g.fillRect(jX, jY, jLargura, jAltura);
         g.setColor(Color.BLUE);
         g.fillRect((int) jogador.getPos_x() - 5, jY - 10, 10, 10); // Canhão
@@ -127,9 +150,10 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
     // LIDAR COM ACOPLAMENTO
     @Override
     public void actionPerformed(ActionEvent e) {
-
-        motorJogo.atualizar();
-
+        //motorJogo.atualizar();
+        if (!noMenu){
+            motorJogo.atualizar();
+        }
         repaint();
     }
 
@@ -138,6 +162,17 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
+
+        if(noMenu) {
+            TipoDeNave[] tipos = TipoDeNave.values();
+            int idx = key - KeyEvent.VK_1;
+            if (idx >= 0 && idx < tipos.length) {
+                motorJogo.setNaveSelecionada(tipos[idx]);
+                motorJogo.inicializarJogo();
+                noMenu = false;
+            }
+            return;
+        }
         if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
             motorJogo.setLeft(true);
         }
