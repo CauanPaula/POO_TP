@@ -1,3 +1,4 @@
+package entidades;
 
 public class Entidade {
 
@@ -16,15 +17,7 @@ public class Entidade {
         if (vida < 1) {
             throw new IllegalArgumentException("Valor invalido para vida");
         }
-        if (dano < 1) {
-            throw new IllegalArgumentException("Valor invalido para dano");
-        }
-        if (vel_x < 0) {
-            throw new IllegalArgumentException("Valor invalido para velocidade horizontal");
-        }
-        if (vel_y < 0) {
-            throw new IllegalArgumentException("Valor invalido para velocidade vertical");
-        }
+
         if (tam_x < 0) {
             throw new IllegalArgumentException("Valor invalido para tamanho horizontal");
         }
@@ -108,7 +101,7 @@ public class Entidade {
     }
 
     public void setDano(int dano) {
-        if (dano < 1) {
+        if (dano < 5) {
             this.dano = dano;
         }
     }
