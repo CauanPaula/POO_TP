@@ -50,8 +50,16 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             return;
         }
 
-        // Desenhar a nave do jogador centralizado
         Jogador jogador = motorJogo.getJogador();
+        ArrayList<Tiro> bulletsJogador = motorJogo.getBulletsJogador();
+        ArrayList<Tiro> bulletsInimigo = motorJogo.getBulletsInimigo();
+        ArrayList<Inimigo> enemies = motorJogo.getEnemies();
+        ArrayList<Buffing> buffs = motorJogo.getBuffs();
+
+        
+        jogador.desenhar(g);
+        // Desenhar a nave do jogador centralizado
+        /*Jogador jogador = motorJogo.getJogador();
         ArrayList<Tiro> bulletsJogador = motorJogo.getBulletsJogador();
         ArrayList<Tiro> bulletsInimigo = motorJogo.getBulletsInimigo();
         ArrayList<Inimigo> enemies = motorJogo.getEnemies();
@@ -67,7 +75,7 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         g.fillRect(jX, jY, jLargura, jAltura);
         g.setColor(Color.BLUE);
         g.fillRect((int) jogador.getPos_x() - 5, jY - 10, 10, 10); // Canhão
-
+ */
         //Desenhar os tiros do jogador
         g.setColor(Color.YELLOW);
         for (Tiro b : bulletsJogador) {
