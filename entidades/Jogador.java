@@ -56,21 +56,33 @@ public class Jogador extends Entidade implements Atirador {
     }
 
     @Override 
-    public void disparar (GerenciadorTiros gerenciador){
-        double posY = getPos_y() - getTam_y() - 10;
-        double velY = 10;
+ 
+public void disparar(GerenciadorTiros gerenciador) {
 
-        Tiro newTiro = new Tiro(1,
-                    getDano(),
-                    0.0,
-                    velY,
-                    getCadencia(),
-                    3.0,
-                    8.0);
-        
-        newTiro.setPos_x(getPos_x());
-        newTiro.setPos_y(posY);
+    double posY = getPos_y() - getTam_y() - 10;
+    double velY = 10;
 
-        gerenciador.adicionarTiroJogador(newTiro);
-    }
+    String pasta = "imagens/tipoTiro/";
+
+    Image imgInit = new ImageIcon(
+        pasta + "tiro_init.png"
+    ).getImage();
+    
+    Tiro newTiro = new Tiro(
+        1,
+        getDano(),
+        0.0,
+        velY,
+        getCadencia(),
+        30.0,
+        35.0
+    );
+
+    newTiro.setSprite(imgInit);
+
+    newTiro.setPos_x(getPos_x());
+    newTiro.setPos_y(posY);
+
+    gerenciador.adicionarTiroJogador(newTiro);
+}
 }

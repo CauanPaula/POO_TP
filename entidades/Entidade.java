@@ -39,21 +39,23 @@ import java.awt.Graphics;public class Entidade {
     }
            
         
-
-       public void desenhar(Graphics g) {
-        int x = (int) (this.pos_x - this.tam_x);
-        int y = (int) (this.pos_y - this.tam_y);
-        int largura = (int) (this.tam_x * 2);
-        int altura = (int) (this.tam_y * 2);
-
-        if (this.sprite != null && this.sprite.getWidth(null) > 0) {
-            g.drawImage(this.sprite, x, y, largura, altura, null);
-        } else {
-           
-            g.setColor(java.awt.Color.CYAN);
-            g.fillRect(x, y, largura, altura);
+        public void setSprite(Image sprite) {
+            this.sprite = sprite;
         }
+       public void desenhar(Graphics g) {
+    int x = (int) (pos_x - tam_x);
+    int y = (int) (pos_y - tam_y);
+
+    int largura = (int) (tam_x * 2);
+    int altura = (int) (tam_y * 2);
+
+    if (sprite != null && sprite.getWidth(null) > 0) {
+        g.drawImage(sprite, x, y, largura, altura, null);
+    } else {
+        g.setColor(java.awt.Color.CYAN);
+        g.fillRect(x, y, largura, altura);
     }
+}
     
     public int getLargura() { return sprite.getWidth(null); }
     public int getAltura() { return sprite.getHeight(null); }
