@@ -17,6 +17,14 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
 
     private Timer timer;
     private Jogo motorJogo;
+    private Image besouroGif;
+    private Image abelhaGif;
+    private Image libelulaGif;
+    private Image aranhaGif;
+    private Image tiroAbelha;
+    private Image tiroLibelula;
+    private Image tiroBesouro;
+    private Image tiroAranha;
 
     private int tamanhoTelaX = 800;
     private int tamanhoTelaY = 600;
@@ -30,17 +38,25 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         addKeyListener(this);
 
         this.motorJogo = new Jogo(this.tamanhoTelaX, this.tamanhoTelaY);
+        besouroGif = new ImageIcon("imagens/besouro/andando.gif").getImage();
+        abelhaGif = new ImageIcon("imagens/abelha/voando.gif").getImage();
+        libelulaGif = new ImageIcon("imagens/libelula/zap.gif").getImage();
+        aranhaGif = new ImageIcon("imagens/aranha/aranha.gif").getImage();
+        tiroAbelha = new ImageIcon("imagens/abelha/tiro.png").getImage();
+        tiroLibelula = new ImageIcon("imagens/libelula/tiro.png").getImage();
+        tiroBesouro = new ImageIcon("imagens/besouro/tiro.png").getImage();
+        tiroAranha = new ImageIcon("imagens/aranha/tiro.png").getImage();
 
         // Timer para atualizar o jogo a ~60 FPS (16ms)
         timer = new Timer(16, this);
         timer.start();
     }
 
-    //COMO NÃO EXISTEM IMAGENS AINDA, O CODIGO DESENHA AS FIGURAS
+    // COMO NÃO EXISTEM IMAGENS AINDA, O CODIGO DESENHA AS FIGURAS
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         if (noMenu) {
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.BOLD, 28));
@@ -49,8 +65,10 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             int y = 260;
             for (TipoDeNave t : TipoDeNave.values()) {
                 g.drawString((t.ordinal() + 1) + " - " + t.name()
-                    + String.format("  (vida x%.1f, dano x%.1f, vel x%.1f, cad x%.1f)",
-                        t.getMultiplicaVida(), t.getMultiplicaDano(), t.getMultiplicaVelocidade(), t.getMultiplicaCadencia()), 120, y);
+                        + String.format("  (vida x%.1f, dano x%.1f, vel x%.1f, cad x%.1f)",
+                                t.getMultiplicaVida(), t.getMultiplicaDano(), t.getMultiplicaVelocidade(),
+                                t.getMultiplicaCadencia()),
+                        120, y);
                 y += 35;
             }
             return;
@@ -63,7 +81,9 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
 
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.BOLD, 20));
-            g.drawString(motorJogo.getScore().getNomePlayer() + " - Score Final: " + motorJogo.getScore().getScorePlayer(), 265, 310);
+            g.drawString(
+                    motorJogo.getScore().getNomePlayer() + " - Score Final: " + motorJogo.getScore().getScorePlayer(),
+                    265, 310);
             g.drawString("Pressione R para reiniciar", 275, 350);
             return;
         }
@@ -75,60 +95,111 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         ArrayList<Inimigo> enemies = motorJogo.getEnemies();
         ArrayList<Buffing> buffs = motorJogo.getBuffs();
 
-
         int jX = (int) (jogador.getPos_x() - jogador.getTam_x());
         int jY = (int) (jogador.getPos_y() - jogador.getTam_y());
         int jLargura = (int) (jogador.getTam_x() * 2);
         int jAltura = (int) (jogador.getTam_y() * 2);
 
-        //g.setColor(Color.CYAN);
-        switch (jogador.getTipo()) {
-            case TIP1 -> g.setColor(Color.CYAN);
-            case TIP2 -> g.setColor(Color.PINK);
-            case TIP3 -> g.setColor(Color.LIGHT_GRAY);
-        }
-        g.fillRect(jX, jY, jLargura, jAltura);
-        g.setColor(Color.BLUE);
-        g.fillRect((int) jogador.getPos_x() - 5, jY - 10, 10, 10); // Canhão
+        // g.setColor(Color.CYAN);
 
-        //Desenhar os tiros do jogador
+        // NAVE 3 - BESOURO
+        if (jogador.getTipo() == TipoDeNave.TIP3) {
+            int tamanho = 60;
+
+            int x = (int) jogador.getPos_x() - tamanho / 2;
+            int y = (int) jogador.getPos_y() - tamanho / 2;
+
+            g.drawImage(besouroGif, x, y, tamanho, tamanho, this);
+
+        } else if (jogador.getTipo() == TipoDeNave.TIP1) {
+            // NAVE 1 - ABELHA
+            int tamanho = 55;
+
+            int x = (int) jogador.getPos_x() - tamanho / 2;
+            int y = (int) jogador.getPos_y() - tamanho / 2;
+
+            g.drawImage(abelhaGif, x, y, tamanho, tamanho, this);
+
+        } else if (jogador.getTipo() == TipoDeNave.TIP2) {
+            // NAVE 2 - LIBÉLULA
+            int tamanho = 55;
+
+            int x = (int) jogador.getPos_x() - tamanho / 2;
+            int y = (int) jogador.getPos_y() - tamanho / 2;
+
+            g.drawImage(libelulaGif, x, y, tamanho, tamanho, this);
+        }
+
+        // Desenhar os tiros do jogador
         g.setColor(Color.YELLOW);
+        // Desenhar os tiros do jogador
         for (Tiro b : bulletsJogador) {
-            int bX = (int) (b.getPos_x() - b.getTam_x());
-            int bY = (int) (b.getPos_y() - b.getTam_y());
-            int bW = (int) (b.getTam_x() * 2);
-            int bH = (int) (b.getTam_y() * 2);
-            g.fillRect(bX, bY, bW, bH);
-        }
 
-        //Desenhar os tiros do inimigo
-        g.setColor(Color.GREEN);
-        for (Tiro b : bulletsInimigo) {
-            int bX = (int) (b.getPos_x() - b.getTam_x());
-            int bY = (int) (b.getPos_y() - b.getTam_y());
-            int bW = (int) (b.getTam_x() * 2);
-            int bH = (int) (b.getTam_y() * 2);
-            g.fillRect(bX, bY, bW, bH);
-        }
+            Image imagemTiro;
+            int largura;
+            int altura;
 
-        //Desenhar os inimigos
-        for (Inimigo en : enemies) {
-            switch (en.getTipoInimigo()) {
-                case 1 ->
-                    g.setColor(Color.ORANGE);
-                case 2 ->
-                    g.setColor(Color.MAGENTA);
-                default ->
-                    g.setColor(Color.RED);
+            switch (jogador.getTipo()) {
+                case TIP1 -> {
+                    imagemTiro = tiroAbelha;
+                    largura = 10;
+                    altura = 20;
+                }
+                case TIP2 -> {
+                    imagemTiro = tiroLibelula;
+                    largura = 8;
+                    altura = 20;
+                }
+                default -> {
+                    imagemTiro = tiroBesouro;
+                    largura = 20;
+                    altura = 20;
+                }
             }
-            int eX = (int) (en.getPos_x() - en.getTam_x());
-            int eY = (int) (en.getPos_y() - en.getTam_y());
-            int eW = (int) (en.getTam_x() * 2);
-            int eH = (int) (en.getTam_y() * 2);
-            g.fillRect(eX, eY, eW, eH);
+
+            int x = (int) b.getPos_x() - largura / 2;
+            int y = (int) b.getPos_y() - altura / 2;
+
+            g.drawImage(imagemTiro, x, y, largura, altura, this);
         }
 
-        //Desenhar os buffs
+        // Desenhar os tiros do inimigo
+        for (Tiro b : bulletsInimigo) {
+            int largura = 15;
+            int altura = 37;
+
+            int x = (int) b.getPos_x() - largura / 2;
+            int y = (int) b.getPos_y() - altura / 2;
+
+            g.drawImage(tiroAranha, x, y, largura, altura, this);
+        }
+
+        // Desenhar os inimigos
+        for (Inimigo en : enemies) {
+
+            if (en.getTipoInimigo() == 1) {
+
+                int tamanho = 70;
+
+                int x = (int) en.getPos_x() - tamanho / 2;
+                int y = (int) en.getPos_y() - tamanho / 2;
+
+                g.drawImage(aranhaGif, x, y, tamanho, tamanho, this);
+
+            } else {
+
+                g.setColor(Color.MAGENTA);
+
+                int eX = (int) (en.getPos_x() - en.getTam_x());
+                int eY = (int) (en.getPos_y() - en.getTam_y());
+                int eW = (int) (en.getTam_x() * 2);
+                int eH = (int) (en.getTam_y() * 2);
+
+                g.fillRect(eX, eY, eW, eH);
+            }
+        }
+
+        // Desenhar os buffs
         for (Buffing b : buffs) {
             g.setColor(Color.GRAY);
             int bX = (int) (b.getPos_x() - b.getTam_x());
@@ -150,20 +221,19 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
     // LIDAR COM ACOPLAMENTO
     @Override
     public void actionPerformed(ActionEvent e) {
-        //motorJogo.atualizar();
-        if (!noMenu){
+        // motorJogo.atualizar();
+        if (!noMenu) {
             motorJogo.atualizar();
         }
         repaint();
     }
 
-
-    //Verificacao de teclas para movimentacao e disparo
+    // Verificacao de teclas para movimentacao e disparo
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
 
-        if(noMenu) {
+        if (noMenu) {
             TipoDeNave[] tipos = TipoDeNave.values();
             int idx = key - KeyEvent.VK_1;
             if (idx >= 0 && idx < tipos.length) {
@@ -218,9 +288,10 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
     }
-    //Reduzir e retirar caso necessário partes que não tenham função real mais nesses códigos, um grande exemplo sendo o metodo de colisao
+    // Reduzir e retirar caso necessário partes que não tenham função real mais
+    // nesses códigos, um grande exemplo sendo o metodo de colisao
 
-    //MAIN PARA TESTES
+    // MAIN PARA TESTES
     public static void main(String[] args) {
         JFrame frame = new JFrame("Teste do jogo");
         Cenario game = new Cenario();
