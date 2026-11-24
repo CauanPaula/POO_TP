@@ -20,6 +20,7 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
 
     private int tamanhoTelaX = 800;
     private int tamanhoTelaY = 600;
+    private int opcaoSelecionada = 0;
 
     private boolean noMenu = true;
 
@@ -48,11 +49,20 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             g.setFont(new Font("Arial", Font.BOLD, 18));
             int y = 260;
             for (TipoDeNave t : TipoDeNave.values()) {
-                g.drawString((t.ordinal() + 1) + " - " + t.name()
-                    + String.format("  (vida x%.1f, dano x%.1f, vel x%.1f, cad x%.1f)",
-                        t.getMultiplicaVida(), t.getMultiplicaDano(), t.getMultiplicaVelocidade(), t.getMultiplicaCadencia()), 120, y);
-                y += 35;
+               Jogador j = new Jogador(t, 20, 15);
+               boolean selecionada = (t.ordinal() == opcaoSelecionada);
+
+               g.setColor(selecionada ? Color.RED : Color.WHITE);
+               g.drawString((selecionada ? "> " : "   ") + t.name()
+                  + String.format(" -> vida: %d, dano: %d, velocidade: %.0f, cadencia: %.0f",
+                    j.getVida(), j.getDano(), j.getVel_x(), j.getCadencia()), 120, y);
+               y += 35;
             }
+
+            g.setColor(Color.GRAY);
+            g.setFont(new Font("Arial", Font.PLAIN, 14));
+            g.drawString("W/S ou setas para navegar, Enter para confirmar", 230, y + 20);
+
             return;
         }
 
@@ -65,6 +75,7 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             g.setFont(new Font("Arial", Font.BOLD, 20));
             g.drawString(motorJogo.getScore().getNomePlayer() + " - Score Final: " + motorJogo.getScore().getScorePlayer(), 265, 310);
             g.drawString("Pressione R para reiniciar", 275, 350);
+            g.drawString("Pressione M para voltar ao menu", 255, 380);  
             return;
         }
 
@@ -83,9 +94,9 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
 
         //g.setColor(Color.CYAN);
         switch (jogador.getTipo()) {
-            case TIP1 -> g.setColor(Color.CYAN);
-            case TIP2 -> g.setColor(Color.PINK);
-            case TIP3 -> g.setColor(Color.LIGHT_GRAY);
+            case Abelha -> g.setColor(Color.CYAN);
+            case Libelula -> g.setColor(Color.PINK);
+            case Besouro -> g.setColor(Color.LIGHT_GRAY);
         }
         g.fillRect(jX, jY, jLargura, jAltura);
         g.setColor(Color.BLUE);
@@ -144,7 +155,7 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         g.drawString("Score: " + motorJogo.getScore().getScorePlayer(), 20, 30);
         g.drawString("Vida: " + motorJogo.getJogador().getVida(), 20, 55);
         g.drawString("Dano: " + motorJogo.getJogador().getDano(), 20, 80);
-        g.drawString(String.format("Cadência: %.1f", motorJogo.getJogador().getCadencia()), 20, 105);
+        g.drawString(String.format("Cadência: %.0f", motorJogo.getJogador().getCadencia()), 20, 105);
     }
 
     // LIDAR COM ACOPLAMENTO
@@ -162,19 +173,22 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
+        if (noMenu) {
+            int total = TipoDeNave.values().length;
 
-        if(noMenu) {
-            TipoDeNave[] tipos = TipoDeNave.values();
-            int idx = key - KeyEvent.VK_1;
-            if (idx >= 0 && idx < tipos.length) {
-                motorJogo.setNaveSelecionada(tipos[idx]);
+            if (key == KeyEvent.VK_UP || key == KeyEvent.VK_W) {
+                opcaoSelecionada = (opcaoSelecionada - 1 + total) % total;
+            } else if (key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S) {
+                opcaoSelecionada = (opcaoSelecionada + 1) % total;
+            } else if (key == KeyEvent.VK_ENTER || key == KeyEvent.VK_SPACE) {
+                motorJogo.setNaveSelecionada(TipoDeNave.values()[opcaoSelecionada]);
                 motorJogo.inicializarJogo();
                 noMenu = false;
             }
             return;
         }
         if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
-            motorJogo.setLeft(true);
+                    motorJogo.setLeft(true);
         }
         if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) {
             motorJogo.setRight(true);
@@ -192,6 +206,9 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
 
         if (key == KeyEvent.VK_R && motorJogo.isGameOver()) {
             motorJogo.inicializarJogo();
+        }
+        if (key == KeyEvent.VK_M && motorJogo.isGameOver()) {
+            noMenu = true;
         }
     }
 

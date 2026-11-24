@@ -21,7 +21,7 @@ public class Jogo {
     private Score score;
     private GerenciadorTiros motorTiros;
     private GerenciadorColisoes motorColisoes;
-    private TipoDeNave naveSelecionada = TipoDeNave.TIP1;
+    private TipoDeNave naveSelecionada = TipoDeNave.Abelha;
 
     private ArrayList<Inimigo> enemies;
     private ArrayList<Buffing> buffs;

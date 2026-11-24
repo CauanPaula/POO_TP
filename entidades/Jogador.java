@@ -7,7 +7,7 @@ import tipos.TipoDeNave;
 public class Jogador extends Entidade implements Atirador {
 
 
-    private static final int VidaBase = 3;
+    private static final int VidaBase = 5;
     private static final int DanoBase = 2;
     private static final double VelocidadeBase = 6.0;
     private static final double CadenciaBase = 1.0;
