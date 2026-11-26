@@ -22,14 +22,27 @@ public class GerenciadorTiros {
     public void atualizarTiro(int tamanhoTelaY){
 
         Iterator<Tiro> iterator = tirosDoJogador.iterator();
-        while(iterator.hasNext()){
-            Tiro tiro = iterator.next();
 
-            tiro.mover();
+while(iterator.hasNext()){
+    Tiro tiro = iterator.next();
 
-            if(tiro.getPos_y() - tiro.getTam_y() < 0){
-                iterator.remove();
-            }
+    
+    if(tiro.isEmImpacto()){
+
+        if(tiro.atualizarImpacto()){
+            iterator.remove();
+        }
+
+        continue;
+    }
+
+    // Se não estiver em impacto, continua se movimentando
+    tiro.mover();
+
+    // Remove se sair da tela
+    if(tiro.getPos_y() - tiro.getTam_y() < 0){
+        iterator.remove();
+    }
 
         }
         Iterator<Tiro> iteratorInimigo = tirosDosInimigos.iterator();

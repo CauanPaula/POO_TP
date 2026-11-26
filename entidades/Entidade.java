@@ -1,6 +1,6 @@
 package entidades;
-
-public class Entidade {
+import java.awt.Image;
+import java.awt.Graphics;public class Entidade {
 
     private int vida;
     private int dano;
@@ -11,7 +11,7 @@ public class Entidade {
     private double cadencia;
     private double tam_x;
     private double tam_y;
-
+    protected Image sprite;
     //construtor
     public Entidade(int vida, int dano, double vel_x, double vel_y, double cadencia, double tam_x, double tam_y) {
         if (vida < 1) {
@@ -37,6 +37,31 @@ public class Entidade {
         this.tam_x = tam_x;
         this.tam_y = tam_y;
     }
+           
+        
+        public void setSprite(Image sprite) {
+            this.sprite = sprite;
+        }
+       public void desenhar(Graphics g) {
+    int x = (int) (pos_x - tam_x);
+    int y = (int) (pos_y - tam_y);
+
+    int largura = (int) (tam_x * 2);
+    int altura = (int) (tam_y * 2);
+
+    if (sprite != null && sprite.getWidth(null) > 0) {
+        g.drawImage(sprite, x, y, largura, altura, null);
+    } else {
+        g.setColor(java.awt.Color.CYAN);
+        g.fillRect(x, y, largura, altura);
+    }
+}
+    
+    public int getLargura() { return sprite.getWidth(null); }
+    public int getAltura() { return sprite.getHeight(null); }
+    
+
+        
 
     //funcoes de get
     public int getVida() {

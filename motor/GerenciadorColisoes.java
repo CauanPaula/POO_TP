@@ -8,8 +8,13 @@ import entidades.Entidade;
 import entidades.Inimigo;
 import entidades.Jogador;
 import entidades.Tiro;
+import javax.swing.ImageIcon;
+import java.awt.Image;
 
 public class GerenciadorColisoes {
+    private Image spriteImpacto = new ImageIcon(
+    "imagens/tipoTiro/tiro_impacto.png"
+    ).getImage();
     
     private boolean colidem(Entidade a, Entidade b) {
         return Math.abs(a.getPos_x() - b.getPos_x())
@@ -20,7 +25,7 @@ public class GerenciadorColisoes {
 
 
     public boolean verificarColisoes(Jogador jogador,List<Inimigo> inimigos,List<Tiro> tiroJogador, List<Tiro> tiroInimigo,List<Buffing> buffs,Score score) {
-
+            
             boolean jogadorMorreu = false;
 
             Iterator<Inimigo> inimigoIterator  = inimigos.iterator();
@@ -41,22 +46,24 @@ public class GerenciadorColisoes {
 
                 Iterator<Tiro> tiroJogadorIterator = tiroJogador.iterator();
 
-                while(tiroJogadorIterator.hasNext()){
-                    Tiro tiro = tiroJogadorIterator.next();
+while(tiroJogadorIterator.hasNext()){
+    Tiro tiro = tiroJogadorIterator.next();
 
-                    if(colidem(tiro,inimigo)){
-                        tiroJogadorIterator.remove();
+    if(colidem(tiro, inimigo) && !tiro.isEmImpacto()){
 
-                        boolean vivo = inimigo.receberDano(tiro.getDano());
+        // Troca a imagem do tiro pela imagem de impacto
+        tiro.iniciarImpacto(spriteImpacto);
 
-                        if(!vivo){
-                            score.pontuar(10*inimigo.getTipoInimigo());
-                            inimigoIterator.remove();
-                            break;
-                        }
+        // Aplica o dano no inimigo
+        boolean vivo = inimigo.receberDano(tiro.getDano());
 
-                    }
-                }
+        if(!vivo){
+            score.pontuar(10 * inimigo.getTipoInimigo());
+            inimigoIterator.remove();
+            break;
+        }
+    }
+}
 
 
                 Iterator<Tiro> tiroInimigoIterator = tiroInimigo.iterator();
