@@ -53,7 +53,7 @@ public class Jogo {
         this.jogador = new Jogador(naveSelecionada, 25, 38);
         this.jogador.setPos_x(500);
         this.jogador.setPos_y(420);
-
+         motor.GerenciadorSom.tocarMusica("sons/musica_fundo.wav");
         this.score = new Score(0);
         score.setNomePlayer("Jogador 1"); 
 
@@ -223,6 +223,8 @@ public class Jogo {
 
         if (jogadorMorreu){
             this.gameOver = true;
+            motor.GerenciadorSom.pararMusica();
+            motor.GerenciadorSom.tocarEfeito("sons/gameover.wav");
         }
     }
 

@@ -94,7 +94,7 @@ public class GerenciadorSom {
         }
     }
 
-    public static void tocarMusica(String caminhoArquivo) {
+   public static void tocarMusica(String caminhoArquivo) {
         pararMusica();
         if (!somAtivado || volumePercentual == 0) return;
 
@@ -106,8 +106,7 @@ public class GerenciadorSom {
             clipMusica = criarClipCompativel(audioIn.getFormat());
             clipMusica.open(audioIn);
             aplicarVolume(clipMusica);
-            clipMusica.loop(Clip.LOOP_CONTINUOUSLY);
-            clipMusica.start();
+            clipMusica.loop(Clip.LOOP_CONTINUOUSLY); // Inicia o loop contínuo sozinho
         } catch (Exception e) {
             System.out.println("ERRO DE MÚSICA (" + caminhoArquivo + "): " + e.getMessage());
             e.printStackTrace();

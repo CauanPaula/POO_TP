@@ -68,7 +68,7 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             for (TipoDeNave t : TipoDeNave.values()) {
                 Jogador j = new Jogador(t, 20, 15);
                 boolean selecionada = (t.ordinal() == opcaoSelecionada);
-
+                motor.GerenciadorSom.tocarMusica("sons/musica_fundo.wav");
                 g.setColor(selecionada ? Color.RED : Color.WHITE);
                 g.drawString((selecionada ? "> " : "   ") + t.name()
                         + String.format(" -> vida: %d, dano: %d, velocidade: %.0f, cadencia: %.0f",
