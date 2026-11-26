@@ -1,15 +1,14 @@
 package motor;
 
-import java.util.Iterator;
-import java.util.List;
-
 import entidades.Buffing;
 import entidades.Entidade;
 import entidades.Inimigo;
 import entidades.Jogador;
 import entidades.Tiro;
-import javax.swing.ImageIcon;
 import java.awt.Image;
+import java.util.Iterator;
+import java.util.List;
+import javax.swing.ImageIcon;
 
 public class GerenciadorColisoes {
     private Image spriteImpacto = new ImageIcon(
@@ -37,7 +36,7 @@ public class GerenciadorColisoes {
                     if(!jogador.receberDano(inimigo.getDano())){
                         jogadorMorreu = true;
                     }
-
+                    motor.GerenciadorSom.tocarEfeito("sons/dano.wav");
                     inimigoIterator.remove();
                     continue;
 
@@ -59,6 +58,7 @@ while(tiroJogadorIterator.hasNext()){
 
         if(!vivo){
             score.pontuar(10 * inimigo.getTipoInimigo());
+            GerenciadorSom.tocarEfeito("sons/inimigo_morte.wav");
             inimigoIterator.remove();
             break;
         }
@@ -93,6 +93,7 @@ while(tiroJogadorIterator.hasNext()){
 
                 if(colidem(jogador,buff)){
                     buff.ativarBuffing(jogador);
+                    GerenciadorSom.tocarEfeito("sons/buff.wav");
                     buffIterator.remove();
                 }
             }
