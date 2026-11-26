@@ -11,6 +11,7 @@ import entidades.Buffing;
 import entidades.Inimigo;
 import entidades.Jogador;
 import entidades.Tiro;
+import tipos.TipoDeNave;
 
 public class Cenario extends JPanel implements ActionListener, KeyListener {
 
@@ -19,6 +20,9 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
 
     private int tamanhoTelaX = 800;
     private int tamanhoTelaY = 600;
+    private int opcaoSelecionada = 0;
+
+    private boolean noMenu = true;
 
     public Cenario() {
         setPreferredSize(new Dimension(this.tamanhoTelaX, this.tamanhoTelaY));
@@ -33,92 +37,121 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         timer.start();
     }
 
-    
     @Override
-protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
-    if (motorJogo.isGameOver()) {
-        g.setColor(Color.RED);
-        g.setFont(new Font("Arial", Font.BOLD, 36));
-        g.drawString("FIM DE JOGO", 280, 260);
+        // 1. Tela de Menu (vindo da main)
+        if (noMenu) {
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 28));
+            g.drawString("Escolha sua nave", 290, 200);
+            g.setFont(new Font("Arial", Font.BOLD, 18));
+            int y = 260;
+            for (TipoDeNave t : TipoDeNave.values()) {
+                Jogador j = new Jogador(t, 20, 15);
+                boolean selecionada = (t.ordinal() == opcaoSelecionada);
 
+                g.setColor(selecionada ? Color.RED : Color.WHITE);
+                g.drawString((selecionada ? "> " : "   ") + t.name()
+                        + String.format(" -> vida: %d, dano: %d, velocidade: %.0f, cadencia: %.0f",
+                                j.getVida(), j.getDano(), j.getVel_x(), j.getCadencia()), 120, y);
+                y += 35;
+            }
+
+            g.setColor(Color.GRAY);
+            g.setFont(new Font("Arial", Font.PLAIN, 14));
+            g.drawString("W/S ou setas para navegar, Enter para confirmar", 230, y + 20);
+            return;
+        }
+
+        // 2. Tela de Game Over (vindo da main com opção de voltar ao menu)
+        if (motorJogo.isGameOver()) {
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.BOLD, 36));
+            g.drawString("FIM DE JOGO", 280, 260);
+
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString(motorJogo.getScore().getNomePlayer() + " - Score Final: " + motorJogo.getScore().getScorePlayer(), 265, 310);
+            g.drawString("Pressione R para reiniciar", 275, 350);
+            g.drawString("Pressione M para voltar ao menu", 255, 380);
+            return;
+        }
+
+        // 3. Recupera entidades do motor
+        Jogador jogador = motorJogo.getJogador();
+        ArrayList<Tiro> bulletsJogador = motorJogo.getBulletsJogador();
+        ArrayList<Tiro> bulletsInimigo = motorJogo.getBulletsInimigo();
+        ArrayList<Inimigo> enemies = motorJogo.getEnemies();
+        ArrayList<Buffing> buffs = motorJogo.getBuffs();
+
+        // 4. Desenhar inimigos
+        for (Inimigo en : enemies) {
+            switch (en.getTipoInimigo()) {
+                case 1 -> g.setColor(Color.ORANGE);
+                case 2 -> g.setColor(Color.MAGENTA);
+                default -> g.setColor(Color.RED);
+            }
+            int x = (int) (en.getPos_x() - en.getTam_x());
+            int y = (int) (en.getPos_y() - en.getTam_y());
+            int largura = (int) (en.getTam_x() * 2);
+            int altura = (int) (en.getTam_y() * 2);
+            g.fillRect(x, y, largura, altura);
+        }
+
+        // 5. Desenhar buffs (com sprite)
+        for (Buffing b : buffs) {
+            b.desenhar(g);
+        }
+
+        // 6. Desenhar tiros do jogador (com sprite)
+        for (Tiro tiro : bulletsJogador) {
+            tiro.desenhar(g);
+        }
+
+        // 7. Desenhar tiros dos inimigos (com sprite)
+        for (Tiro tiro : bulletsInimigo) {
+            tiro.desenhar(g);
+        }
+
+        // 8. Desenhar jogador (com sprite)
+        jogador.desenhar(g);
+
+        // 9. Desenhar HUD
         g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString(
-            motorJogo.getScore().getNomePlayer() + " - Score Final: "
-            + motorJogo.getScore().getScorePlayer(), 265, 310
-        );
-        g.drawString("Pressione R para reiniciar", 275, 350);
-        return;
+        g.setFont(new Font("Arial", Font.BOLD, 16));
+        g.drawString("Score: " + motorJogo.getScore().getScorePlayer(), 20, 30);
+        g.drawString("Vida: " + jogador.getVida(), 20, 55);
+        g.drawString("Dano: " + jogador.getDano(), 20, 80);
+        g.drawString(String.format("Cadência: %.1f", jogador.getCadencia()), 20, 105);
     }
 
-    Jogador jogador = motorJogo.getJogador();
-    ArrayList<Tiro> bulletsJogador = motorJogo.getBulletsJogador();
-    ArrayList<Tiro> bulletsInimigo = motorJogo.getBulletsInimigo();
-    ArrayList<Inimigo> enemies = motorJogo.getEnemies();
-    ArrayList<Buffing> buffs = motorJogo.getBuffs();
-
-    // Desenhar inimigos
-    for (Inimigo en : enemies) {
-    switch (en.getTipoInimigo()) {
-        case 1 -> g.setColor(Color.ORANGE);
-        case 2 -> g.setColor(Color.MAGENTA);
-        default -> g.setColor(Color.RED);
-    }
-
-    int x = (int) (en.getPos_x() - en.getTam_x());
-    int y = (int) (en.getPos_y() - en.getTam_y());
-
-    int largura = (int) (en.getTam_x() * 2);
-    int altura = (int) (en.getTam_y() * 2);
-
-    g.fillRect(x, y, largura, altura);
-}
-
-    // Desenhar buffs
-    for (Buffing b : buffs) {
-        b.desenhar(g);
-    }
-
-    // Desenhar tiros do jogador (com sprite)
-    for (Tiro tiro : bulletsJogador) {
-        tiro.desenhar(g);
-    }
-
-    // Desenhar tiros dos inimigos
-    for (Tiro tiro : bulletsInimigo) {
-        tiro.desenhar(g);
-    }
-
-    // Desenhar jogador
-    jogador.desenhar(g);
-
-    // HUD
-    g.setColor(Color.WHITE);
-    g.setFont(new Font("Arial", Font.BOLD, 16));
-    g.drawString("Score: " + motorJogo.getScore().getScorePlayer(), 20, 30);
-    g.drawString("Vida: " + jogador.getVida(), 20, 55);
-    g.drawString("Dano: " + jogador.getDano(), 20, 80);
-    g.drawString(
-        String.format("Cadência: %.1f", jogador.getCadencia()), 20, 105
-    );
-}
-
-    // LIDAR COM ACOPLAMENTO
     @Override
     public void actionPerformed(ActionEvent e) {
-
-        motorJogo.atualizar();
-
+        if (!noMenu) {
+            motorJogo.atualizar();
+        }
         repaint();
     }
 
-
-    //Verificacao de teclas para movimentacao e disparo
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
+        if (noMenu) {
+            int total = TipoDeNave.values().length;
+
+            if (key == KeyEvent.VK_UP || key == KeyEvent.VK_W) {
+                opcaoSelecionada = (opcaoSelecionada - 1 + total) % total;
+            } else if (key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S) {
+                opcaoSelecionada = (opcaoSelecionada + 1) % total;
+            } else if (key == KeyEvent.VK_ENTER || key == KeyEvent.VK_SPACE) {
+                motorJogo.setNaveSelecionada(TipoDeNave.values()[opcaoSelecionada]);
+                motorJogo.inicializarJogo();
+                noMenu = false;
+            }
+            return;
+        }
         if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
             motorJogo.setLeft(true);
         }
@@ -131,13 +164,14 @@ protected void paintComponent(Graphics g) {
         if (key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S) {
             motorJogo.setDown(true);
         }
-
         if (key == KeyEvent.VK_SPACE) {
             motorJogo.setSpace(true);
         }
-
         if (key == KeyEvent.VK_R && motorJogo.isGameOver()) {
             motorJogo.inicializarJogo();
+        }
+        if (key == KeyEvent.VK_M && motorJogo.isGameOver()) {
+            noMenu = true;
         }
     }
 
@@ -164,9 +198,7 @@ protected void paintComponent(Graphics g) {
     @Override
     public void keyTyped(KeyEvent e) {
     }
-    //Reduzir e retirar caso necessário partes que não tenham função real mais nesses códigos, um grande exemplo sendo o metodo de colisao
 
-    //MAIN PARA TESTES
     public static void main(String[] args) {
         JFrame frame = new JFrame("Teste do jogo");
         Cenario game = new Cenario();
