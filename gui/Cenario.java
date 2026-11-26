@@ -1,19 +1,23 @@
 package gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.ArrayList;
-
-import javax.swing.*;
-
-import motor.Jogo;
 import entidades.Buffing;
 import entidades.Inimigo;
 import entidades.Jogador;
 import entidades.Tiro;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.util.ArrayList;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import motor.Jogo;
 import tipos.TipoDeNave;
 
 public class Cenario extends JPanel implements ActionListener, KeyListener {
+    private Image imgFundo;
+    private Image imgFundoMenu;
+    private double bgY = 0;
+    private double velocidadeFundo = 2.0;
 
     private Timer timer;
     private Jogo motorJogo;
@@ -30,9 +34,15 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         setFocusable(true);
         addKeyListener(this);
 
+        try {
+            this.imgFundo = ImageIO.read(new File("imagens/fundo.jpeg"));
+            this.imgFundoMenu = ImageIO.read(new File("imagens/fundo_menu.png"));
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar imagens de fundo: " + e.getMessage());
+        }
+
         this.motorJogo = new Jogo(this.tamanhoTelaX, this.tamanhoTelaY);
 
-        // Timer para atualizar o jogo a ~60 FPS (16ms)
         timer = new Timer(16, this);
         timer.start();
     }
@@ -41,8 +51,15 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // 1. Tela de Menu (vindo da main)
+        int larguraTela = getWidth();
+        int alturaTela = getHeight();
+
+        // 1. Tela de Menu
         if (noMenu) {
+            if (imgFundoMenu != null) {
+                g.drawImage(imgFundoMenu, 0, 0, larguraTela, alturaTela, null);
+            }
+
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.BOLD, 28));
             g.drawString("Escolha sua nave", 290, 200);
@@ -65,18 +82,18 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             return;
         }
 
-        // 2. Tela de Game Over (vindo da main com opção de voltar ao menu)
-        if (motorJogo.isGameOver()) {
-            g.setColor(Color.RED);
-            g.setFont(new Font("Arial", Font.BOLD, 36));
-            g.drawString("FIM DE JOGO", 280, 260);
+        // 2. Fundo em movimento infinito (congela quando der Game Over)
+        if (imgFundo != null) {
+            if (!motorJogo.isGameOver()) {
+                bgY += velocidadeFundo;
+                if (bgY >= alturaTela) {
+                    bgY = 0;
+                }
+            }
 
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.BOLD, 20));
-            g.drawString(motorJogo.getScore().getNomePlayer() + " - Score Final: " + motorJogo.getScore().getScorePlayer(), 265, 310);
-            g.drawString("Pressione R para reiniciar", 275, 350);
-            g.drawString("Pressione M para voltar ao menu", 255, 380);
-            return;
+            int yAtual = (int) bgY;
+            g.drawImage(imgFundo, 0, yAtual, larguraTela, alturaTela, null);
+            g.drawImage(imgFundo, 0, yAtual - alturaTela, larguraTela, alturaTela, null);
         }
 
         // 3. Recupera entidades do motor
@@ -115,7 +132,10 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             tiro.desenhar(g);
         }
 
-        // 8. Desenhar jogador (com sprite)
+        // 8. Desenhar jogador (congela a animação se deu Game Over)
+        if (!motorJogo.isGameOver()) {
+            jogador.atualizarAnimacao();
+        }
         jogador.desenhar(g);
 
         // 9. Desenhar HUD
@@ -125,11 +145,29 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         g.drawString("Vida: " + jogador.getVida(), 20, 55);
         g.drawString("Dano: " + jogador.getDano(), 20, 80);
         g.drawString(String.format("Cadência: %.1f", jogador.getCadencia()), 20, 105);
+
+        // 10. Tela de Game Over desenhada POR CIMA da cena congelada
+        if (motorJogo.isGameOver()) {
+            // Película escura semitransparente para dar leitura ao texto sem esconder o jogo congelado
+            g.setColor(new Color(0, 0, 0, 160));
+            g.fillRect(0, 0, larguraTela, alturaTela);
+
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.BOLD, 36));
+            g.drawString("FIM DE JOGO", 280, 260);
+
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString(motorJogo.getScore().getNomePlayer() + " - Score Final: " + motorJogo.getScore().getScorePlayer(), 265, 310);
+            g.drawString("Pressione R para reiniciar", 275, 350);
+            g.drawString("Pressione M para voltar ao menu", 255, 380);
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (!noMenu) {
+        // Só atualiza posições e colisões enquanto não estiver no menu e não tiver dado Game Over
+        if (!noMenu && !motorJogo.isGameOver()) {
             motorJogo.atualizar();
         }
         repaint();

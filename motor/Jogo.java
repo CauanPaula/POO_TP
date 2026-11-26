@@ -1,13 +1,12 @@
 package motor;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
-
 import entidades.Buffing;
 import entidades.Inimigo;
 import entidades.Jogador;
 import entidades.Tiro;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
 import tipos.TipoDeBuff;
 import tipos.TipoDeNave;
 
@@ -51,7 +50,7 @@ public class Jogo {
 
         //Instanciaçoes
         //this.jogador = new Jogador(3, 2, 6, 6, 1, naveSelecionada.ordinal(), 20, 15);
-        this.jogador = new Jogador(naveSelecionada, 20, 15);
+        this.jogador = new Jogador(naveSelecionada, 25, 38);
         this.jogador.setPos_x(500);
         this.jogador.setPos_y(420);
 
