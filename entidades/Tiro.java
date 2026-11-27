@@ -16,6 +16,7 @@ public class Tiro extends Entidade {
     public Tiro(int vida, int dano, double vel_x, double vel_y, double cadencia, double tam_x, double tam_y) {
         super(vida, dano, vel_x, vel_y, cadencia, tam_x, tam_y);
         this.acertou = false;
+        this.escalaVisual = 1.7;
     }
 
     public void setFramesAnimacao(Image[] framesAnimacao) {

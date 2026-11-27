@@ -1,20 +1,24 @@
-
 from PIL import Image
 import os
 
 # 1. Abre a spritesheet
-img = Image.open("./Sprite Sheet de Projéteis Neon Retro.png").convert("RGBA")
+img = Image.open("./abelha_idle.png").convert("RGBA")
 largura, altura = img.size
 
-# 2. Remove o fundo escuro
+# 2. Remove o fundo quadriculado
 pixels = img.load()
 
 for y in range(altura):
     for x in range(largura):
+
         r, g, b, a = pixels[x, y]
 
-        # Remove pixels muito escuros
-        if r < 20 and g < 30 and b < 20:
+        # Verifica se o pixel é praticamente cinza
+        diferenca = max(r, g, b) - min(r, g, b)
+        brilho = (r + g + b) // 3
+
+        # Pixels neutros claros/cinzas são considerados fundo
+        if diferenca < 30 and brilho > 110:
             pixels[x, y] = (0, 0, 0, 0)
 
 # 3. Configura a grade
@@ -47,7 +51,7 @@ for linha in range(linhas):
             frames.append(frame)
 
 # 5. Define o tamanho final
-canvas_size = 128
+canvas_size = 256
 margem = 8
 area_maxima = canvas_size - margem * 2
 
@@ -62,9 +66,10 @@ escala = min(
 )
 
 # 6. Salva os frames
-os.makedirs("imagens/besouro/impact", exist_ok=True)
+pasta_saida = "imagens/abelha/idle"
+os.makedirs(pasta_saida, exist_ok=True)
 
-contador = 19
+contador = 0
 
 for frame in frames:
 
@@ -89,10 +94,8 @@ for frame in frames:
 
     canvas.alpha_composite(frame, (pos_x, pos_y))
 
-    canvas.save(
-        f"imagens/besouro/fire/frame_{contador:02d}.png"
-    )
+    canvas.save(f"{pasta_saida}/frame_{contador:02d}.png")
 
     contador += 1
 
-print("16 frames salvos em imagens/besouro/fire/")
+print(f"{contador} frames salvos em {pasta_saida}/")

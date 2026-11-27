@@ -12,6 +12,8 @@ import java.awt.Graphics;public class Entidade {
     private double tam_x;
     private double tam_y;
     protected Image sprite;
+    
+    protected double escalaVisual = 1.0;
     //construtor
     public Entidade(int vida, int dano, double vel_x, double vel_y, double cadencia, double tam_x, double tam_y) {
         if (vida < 1) {
@@ -42,20 +44,23 @@ import java.awt.Graphics;public class Entidade {
         public void setSprite(Image sprite) {
             this.sprite = sprite;
         }
-       public void desenhar(Graphics g) {
-    int x = (int) (pos_x - tam_x);
-    int y = (int) (pos_y - tam_y);
+      public void desenhar(Graphics g) {
+        double raioX = tam_x * escalaVisual;
+        double raioY = tam_y * escalaVisual;
 
-    int largura = (int) (tam_x * 2);
-    int altura = (int) (tam_y * 2);
+        int x = (int) (pos_x - raioX);
+        int y = (int) (pos_y - raioY);
 
-    if (sprite != null && sprite.getWidth(null) > 0) {
-        g.drawImage(sprite, x, y, largura, altura, null);
-    } else {
-        g.setColor(java.awt.Color.CYAN);
-        g.fillRect(x, y, largura, altura);
+        int largura = (int) (raioX * 2);
+        int altura = (int) (raioY * 2);
+
+        if (sprite != null && sprite.getWidth(null) > 0) {
+            g.drawImage(sprite, x, y, largura, altura, null);
+        } else {
+            g.setColor(java.awt.Color.CYAN);
+            g.fillRect(x, y, largura, altura);
+        }
     }
-}
     
     public int getLargura() { return sprite.getWidth(null); }
     public int getAltura() { return sprite.getHeight(null); }
