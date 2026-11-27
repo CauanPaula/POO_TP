@@ -23,7 +23,7 @@ public class Inimigo extends Entidade implements Atirador {
     @Override 
     public void disparar (GerenciadorTiros gerenciador){
         double posY = getPos_y() + getTam_y();
-        double velY = -8;
+        double velY = -15;
 
         Tiro newTiro = new Tiro(1,
                     getDano(),
@@ -50,6 +50,10 @@ public class Inimigo extends Entidade implements Atirador {
     }
 
     public void resetarCooldown() {
-        this.cooldownAtual = 50; 
+        if (getTipoInimigo() == 1){
+            this.cooldownAtual = 2;
+        } else {
+            this.cooldownAtual = Math.max(4, (int) (70 / getCadencia())); 
+        } 
     }
 }

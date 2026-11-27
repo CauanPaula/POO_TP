@@ -1,5 +1,6 @@
 package gui;
 
+import entidades.Boss;
 import entidades.Buffing;
 import entidades.Inimigo;
 import entidades.Jogador;
@@ -125,7 +126,8 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             switch (en.getTipoInimigo()) {
                 case 1 -> g.setColor(Color.ORANGE);
                 case 2 -> g.setColor(Color.MAGENTA);
-                default -> g.setColor(Color.RED);
+                case 3 -> g.setColor(Color.RED);
+                default -> g.setColor(Color.WHITE);
             }
             int x = (int) (en.getPos_x() - en.getTam_x());
             int y = (int) (en.getPos_y() - en.getTam_y());
@@ -149,7 +151,13 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             tiro.desenhar(g);
         }
 
-        // 8. Desenhar jogador (congela a animação se deu Game Over)
+        // 8. Desenhar boss
+        Boss boss = motorJogo.getBoss();
+        if (boss != null) {
+            boss.desenhar(g);
+        }
+
+        // 9. Desenhar jogador (congela a animação se deu Game Over)
         if (!motorJogo.isGameOver()) {
             jogador.atualizarAnimacao();
         }
@@ -163,7 +171,36 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         g.drawString("Dano: " + jogador.getDano(), 20, 80);
         g.drawString(String.format("Cadência: %.1f", jogador.getCadencia()), 20, 105);
 
-        // 10. Tela de Game Over desenhada POR CIMA da cena congelada
+        // 10. Cronometro dificuldade 
+        g.setFont(new Font("Arial", Font.BOLD, 16));
+        g.drawString("Nível: " + motorJogo.getDificuldade(), 650, 30);
+        int[] tempo = motorJogo.getTimer();
+        String textoTimer = String.format("%02d:%02d", tempo[0], tempo[1]);
+        if (motorJogo.getDificuldade() > 3){
+            g.drawString("Tempo de Sobrevivência: " + textoTimer, 545, 55);
+        } else {
+            g.drawString("Próximo nível em: " + textoTimer, 580, 55);
+        }
+
+        // 11. Desenhar barra de vida do Boss na parte inferior
+        if (boss != null) {
+            int larguraBarra = 300;
+            int alturaBarra = 14;
+            int xBarra = (larguraTela - larguraBarra) / 2;
+            int yBarra = alturaTela - alturaBarra - 20;
+
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(xBarra, yBarra, larguraBarra, alturaBarra);
+
+            double proporcao = Math.max(0.0, (double) boss.getVida() / boss.getVidaMaxima());
+            g.setColor(Color.RED);
+            g.fillRect(xBarra, yBarra, (int) (larguraBarra * proporcao), alturaBarra);
+
+            g.setColor(Color.WHITE);
+            g.drawRect(xBarra, yBarra, larguraBarra, alturaBarra);
+        }
+
+        // 12. Tela de Game Over desenhada POR CIMA da cena congelada
         if (motorJogo.isGameOver()) {
             // Película escura semitransparente para dar leitura ao texto sem esconder o jogo congelado
             g.setColor(new Color(0, 0, 0, 160));
@@ -178,7 +215,10 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             g.drawString(motorJogo.getScore().getNomePlayer() + " - Score Final: " + motorJogo.getScore().getScorePlayer(), 265, 310);
             g.drawString("Pressione R para reiniciar", 275, 350);
             g.drawString("Pressione M para voltar ao menu", 255, 380);
+            
         }
+
+        
     }
 
     @Override
