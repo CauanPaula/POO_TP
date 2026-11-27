@@ -69,8 +69,8 @@ public class Jogo {
         score.setNomePlayer("Jogador 1"); 
 
         this.nivelDeDificuldade = 1;
-        this.timerDaDificuldade = 5;
-        this.timer = this.FPS*5; //30s
+        this.timerDaDificuldade = 60;
+        this.timer = this.FPS*30; //30s
         this.cronometroPosNivel3 = 1;
 
         this.motorTiros = new GerenciadorTiros();

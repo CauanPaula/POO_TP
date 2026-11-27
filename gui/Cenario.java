@@ -151,6 +151,7 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             tiro.desenhar(g);
         }
 
+        // 8. Desenhar boss
         Boss boss = motorJogo.getBoss();
         if (boss != null) {
             boss.desenhar(g);
