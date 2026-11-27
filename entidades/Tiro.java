@@ -108,8 +108,10 @@ public class Tiro extends Entidade {
         return tempoImpacto <= 0;
     }
 
+// Atualiza a posicao horizontal e vertical do tiro
     @Override 
     public void mover() {
+       setPos_x(getPos_x() + getVel_x()); 
         setPos_y(getPos_y() - getVel_y());
         atualizarAnimacao();
     }

@@ -1,5 +1,6 @@
 package gui;
 
+import entidades.Boss;
 import entidades.Buffing;
 import entidades.Inimigo;
 import entidades.Jogador;
@@ -150,7 +151,12 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             tiro.desenhar(g);
         }
 
-        // 8. Desenhar jogador (congela a animação se deu Game Over)
+        Boss boss = motorJogo.getBoss();
+        if (boss != null) {
+            boss.desenhar(g);
+        }
+
+        // 9. Desenhar jogador (congela a animação se deu Game Over)
         if (!motorJogo.isGameOver()) {
             jogador.atualizarAnimacao();
         }
@@ -164,7 +170,25 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         g.drawString("Dano: " + jogador.getDano(), 20, 80);
         g.drawString(String.format("Cadência: %.1f", jogador.getCadencia()), 20, 105);
 
-        // 10. Tela de Game Over desenhada POR CIMA da cena congelada
+        // 11. Desenhar barra de vida do Boss na parte inferior
+        if (boss != null) {
+            int larguraBarra = 300;
+            int alturaBarra = 14;
+            int xBarra = (larguraTela - larguraBarra) / 2;
+            int yBarra = alturaTela - alturaBarra - 20;
+
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(xBarra, yBarra, larguraBarra, alturaBarra);
+
+            double proporcao = Math.max(0.0, (double) boss.getVida() / boss.getVidaMaxima());
+            g.setColor(Color.RED);
+            g.fillRect(xBarra, yBarra, (int) (larguraBarra * proporcao), alturaBarra);
+
+            g.setColor(Color.WHITE);
+            g.drawRect(xBarra, yBarra, larguraBarra, alturaBarra);
+        }
+
+        // 12. Tela de Game Over desenhada POR CIMA da cena congelada
         if (motorJogo.isGameOver()) {
             // Película escura semitransparente para dar leitura ao texto sem esconder o jogo congelado
             g.setColor(new Color(0, 0, 0, 160));

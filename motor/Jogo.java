@@ -1,5 +1,6 @@
 package motor;
 
+import entidades.Boss;
 import entidades.Buffing;
 import entidades.Inimigo;
 import entidades.Jogador;
@@ -34,6 +35,9 @@ public class Jogo {
     private int enemySpawnTimer;
     private int buffSpawnTimer;
 
+    private Boss boss;
+    private int proximoScoreBoss = 250;
+    private int nivelBoss = 1;
     //Controladores do timer e dificuldade
     private int nivelDeDificuldade;
     private int timerDaDificuldade;
@@ -82,6 +86,9 @@ public class Jogo {
         this.enemySpawnTimer = 0;
         this.buffSpawnTimer = 0;
         this.coolDownTiroJogador = 0;
+        this.boss = null;
+        this.proximoScoreBoss = 250;
+        this.nivelBoss = 1;
 
         //Setar teclados
         this.leftPressed = false; 
@@ -99,8 +106,22 @@ public class Jogo {
         if(this.gameOver) return ;
         if (this.coolDownTiroJogador > 0) {this.coolDownTiroJogador--;}
 
+        verificarSpawnBoss();
         atualizarMovimentacaoDoJogador();
         atualizarTimerDificuldade();
+
+        //Atualiza o boss se estiver ativo
+        if (this.boss != null) {
+            this.boss.atualizar(this.motorTiros, this.enemies);
+            if (this.boss.getVida() <= 0) {
+                this.score.pontuar(100);
+                motor.GerenciadorSom.tocarEfeito("sons/inimigo_morte.wav");
+                this.boss = null;
+                this.nivelBoss++;
+                this.proximoScoreBoss = this.score.getScorePlayer() + 250;
+            }
+        }
+
         gerarEAtualizarInimigos();
         gerarEAtualizarBuffs();
         atualizarTiros();
@@ -108,7 +129,19 @@ public class Jogo {
 
         this.buffs.addAll(buffsPendentes);
         this.buffsPendentes.clear();
+    }
 
+    //Chama o boss a cada 250 pontos e limpa a tela
+    private void verificarSpawnBoss() {
+        if (this.boss == null && this.score.getScorePlayer() >= this.proximoScoreBoss) {
+            this.enemies.clear();
+            this.buffs.clear();
+            this.buffsPendentes.clear();
+            this.motorTiros.reiniciar();
+
+            int vidaBoss = 120 + (this.nivelBoss - 1) * 60;
+            this.boss = new Boss(vidaBoss, 2, this.tamanhoTelaX, this.tamanhoTelaY);
+        }
     }
 
     //Setar cliques para movimentações
@@ -332,8 +365,13 @@ public class Jogo {
         }
     }
 
-    public void verificarColisao(){
-        boolean jogadorMorreu = motorColisoes.verificarColisoes(this.jogador, this.enemies, this.motorTiros.getTirosJogador(), this.motorTiros.getTirosInimigos(), this.buffs, this.score);
+    public void verificarColisao() {
+        boolean jogadorMorreu = motorColisoes.verificarColisoes(
+            this.jogador, this.enemies,
+            this.motorTiros.getTirosJogador(),
+            this.motorTiros.getTirosInimigos(),
+            this.buffs, this.score, this.boss
+        );
 
         if (jogadorMorreu){
             this.gameOver = true;
@@ -349,5 +387,5 @@ public class Jogo {
     public ArrayList<Tiro> getBulletsInimigo() { return this.motorTiros.getTirosInimigos(); }
     public boolean isGameOver() { return this.gameOver; }
     public Score getScore() { return this.score; }
-
+    public Boss getBoss() { return this.boss; }
 }
