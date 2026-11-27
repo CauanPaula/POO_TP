@@ -69,8 +69,8 @@ public class Jogo {
         score.setNomePlayer("Jogador 1"); 
 
         this.nivelDeDificuldade = 1;
-        this.timerDaDificuldade = 60;
-        this.timer = this.FPS*30; //30s
+        this.timerDaDificuldade = 3;
+        this.timer = this.FPS*5; //30s
         this.cronometroPosNivel3 = 1;
 
         this.motorTiros = new GerenciadorTiros();
@@ -199,25 +199,27 @@ public class Jogo {
     //Mudar dificuldade
     public void atualizarTimerDificuldade(){
         if (this.nivelDeDificuldade > 3){
+
             this.cronometroPosNivel3++;
-            int cronometro = this.FPS*this.cronometroPosNivel3;
-            if (cronometro%60 == 0){
+            if (this.cronometroPosNivel3 >= 60){
                 this.timer++;
-            }
-            if (this.timer%120 == 0){
-                this.nivelDeDificuldade++;
+                this.cronometroPosNivel3 = 0;
             }
         } else if (this.timer > 0){
             this.timer--;
         } else {
             this.nivelDeDificuldade++;
-            this.timer = this.FPS*this.timerDaDificuldade;
+            if (this.nivelDeDificuldade <= 3) this.timer = this.FPS*this.timerDaDificuldade;
         }
         
     }
 
     public int getTimer(){
-        return (int) Math.ceil((double) this.timer / FPS);
+        if (this.nivelDeDificuldade > 3){
+            return this.timer;
+        } else {
+            return (int) Math.ceil((double) this.timer / FPS);
+        }
     }
     public int getDificuldade(){
         return this.nivelDeDificuldade;

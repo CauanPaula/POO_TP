@@ -209,7 +209,11 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         // 11. Cronometro dificuldade 
         if (!motorJogo.isGameOver()){
             g.drawString("Nível: " + motorJogo.getDificuldade(), 650, 30);
-            g.drawString("Próximo nível em: " + motorJogo.getTimer() + "s", 600, 55);
+            if (motorJogo.getDificuldade() > 3){
+                g.drawString("Tempo de Sobrevivência: " + motorJogo.getTimer() + "s", 565, 55);
+            } else {
+                g.drawString("Próximo nível em: " + motorJogo.getTimer() + "s", 600, 55);
+            }
         }
     }
 

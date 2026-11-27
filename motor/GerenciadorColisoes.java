@@ -18,9 +18,9 @@ public class GerenciadorColisoes {
     
     private boolean colidem(Entidade a, Entidade b) {
         return Math.abs(a.getPos_x() - b.getPos_x())
-                <= a.getTam_x() + b.getTam_x()
+                <= (a.getTam_x() + b.getTam_x())*0.85
             && Math.abs(a.getPos_y() - b.getPos_y())
-                <= a.getTam_y() + b.getTam_y();
+                <= (a.getTam_y() + b.getTam_y())*0.85;
     }
 
     public boolean verificarColisoes(Jogador jogador, List<Inimigo> inimigos, List<Tiro> tiroJogador, List<Tiro> tiroInimigo, List<Buffing> buffs, Score score, Boss boss) {
