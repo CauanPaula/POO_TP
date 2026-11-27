@@ -39,7 +39,7 @@ public class Jogador extends Entidade implements Atirador {
         this.framesIdle = carregarPastaFrames(pastaBase + "/idle");
         this.framesFire = carregarPastaFrames(pastaBase + "/fire");
         this.framesImpact = carregarPastaFrames(pastaBase + "/impact");
-
+        this.escalaVisual = 1.4;
         this.imgTiro = new ImageIcon("imagens/tipoTiro/tiro_init.png").getImage();
 
         if (this.framesIdle.length > 0) {

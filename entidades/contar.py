@@ -1,9 +1,8 @@
-
 from PIL import Image
 import os
 
 # 1. Abre a spritesheet
-img = Image.open("./abelha_menu.png").convert("RGBA")
+img = Image.open("./abelha_idle.png").convert("RGBA")
 largura, altura = img.size
 
 # 2. Remove o fundo quadriculado
@@ -52,7 +51,7 @@ for linha in range(linhas):
             frames.append(frame)
 
 # 5. Define o tamanho final
-canvas_size = 128
+canvas_size = 256
 margem = 8
 area_maxima = canvas_size - margem * 2
 
@@ -67,7 +66,8 @@ escala = min(
 )
 
 # 6. Salva os frames
-os.makedirs("imagens/menu/besouro/menu", exist_ok=True)
+pasta_saida = "imagens/abelha/idle"
+os.makedirs(pasta_saida, exist_ok=True)
 
 contador = 0
 
@@ -94,10 +94,8 @@ for frame in frames:
 
     canvas.alpha_composite(frame, (pos_x, pos_y))
 
-    canvas.save(
-        f"imagens/menu/besouro/frame_{contador:02d}.png"
-    )
+    canvas.save(f"{pasta_saida}/frame_{contador:02d}.png")
 
     contador += 1
 
-print("16 frames salvos em imagens/menu/besouro/")
+print(f"{contador} frames salvos em {pasta_saida}/")
