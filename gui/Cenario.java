@@ -11,11 +11,9 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import motor.Jogo;
-import tipos.TipoDeNave;
 
 public class Cenario extends JPanel implements ActionListener, KeyListener {
     private Image imgFundo;
-    private Image imgFundoMenu;
     private double bgY = 0;
     private double velocidadeFundo = 2.0;
 
@@ -24,7 +22,7 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
 
     private int tamanhoTelaX = 800;
     private int tamanhoTelaY = 600;
-    private int opcaoSelecionada = 0;
+    private Menu menu;
 
     private boolean noMenu = true;
 
@@ -36,49 +34,68 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
 
         try {
             this.imgFundo = ImageIO.read(new File("imagens/fundo.jpeg"));
-            this.imgFundoMenu = ImageIO.read(new File("imagens/fundo_menu.png"));
         } catch (Exception e) {
             System.out.println("Erro ao carregar imagens de fundo: " + e.getMessage());
         }
 
         this.motorJogo = new Jogo(this.tamanhoTelaX, this.tamanhoTelaY);
 
+        // O menu avisa o Cenario quando o jogador escolhe um inseto
+        this.menu = new Menu(tipo -> {
+            motorJogo.setNaveSelecionada(tipo);
+            motorJogo.inicializarJogo();
+            noMenu = false;
+        }, (largura, altura, cheia) -> aplicarResolucao(largura, altura, cheia));
+
         timer = new Timer(16, this);
         timer.start();
     }
 
+ 
+    private void aplicarResolucao(int largura, int altura, boolean telaCheia) {
+        if (!(SwingUtilities.getWindowAncestor(this) instanceof JFrame frame)) return;
+        GraphicsDevice tela = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+
+        if (telaCheia) {
+            frame.dispose();
+            frame.setUndecorated(true);
+            tela.setFullScreenWindow(frame);
+        } else {
+            if (tela.getFullScreenWindow() == frame) tela.setFullScreenWindow(null);
+            frame.dispose();
+            frame.setUndecorated(false);
+            setPreferredSize(new Dimension(largura, altura));
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+        }
+        frame.setVisible(true);
+        requestFocusInWindow();
+    }
+
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    protected void paintComponent(Graphics g0) {
+        super.paintComponent(g0);
 
-        int larguraTela = getWidth();
-        int alturaTela = getHeight();
+        Graphics2D g = (Graphics2D) g0.create();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        // 1. Tela de Menu
+        // Escala uniforme e centralizada (em tela cheia sobram faixas pretas)
+        double escala = Math.min(getWidth() / (double) tamanhoTelaX, getHeight() / (double) tamanhoTelaY);
+        double offX = (getWidth() - tamanhoTelaX * escala) / 2;
+        double offY = (getHeight() - tamanhoTelaY * escala) / 2;
+
+        g.translate(offX, offY);
+        g.scale(escala, escala);
+
+        desenharTudo(g, tamanhoTelaX, tamanhoTelaY);
+        g.dispose();
+    }
+
+    private void desenharTudo(Graphics g, int larguraTela, int alturaTela) {
+
+        // 1. Tela de Menu (desenhada pela classe Menu)
         if (noMenu) {
-            if (imgFundoMenu != null) {
-                g.drawImage(imgFundoMenu, 0, 0, larguraTela, alturaTela, null);
-            }
-
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.BOLD, 28));
-            g.drawString("Escolha sua nave", 290, 200);
-            g.setFont(new Font("Arial", Font.BOLD, 18));
-            int y = 260;
-            for (TipoDeNave t : TipoDeNave.values()) {
-                Jogador j = new Jogador(t, 20, 15);
-                boolean selecionada = (t.ordinal() == opcaoSelecionada);
-                motor.GerenciadorSom.tocarMusica("sons/musica_fundo.wav");
-                g.setColor(selecionada ? Color.RED : Color.WHITE);
-                g.drawString((selecionada ? "> " : "   ") + t.name()
-                        + String.format(" -> vida: %d, dano: %d, velocidade: %.0f, cadencia: %.0f",
-                                j.getVida(), j.getDano(), j.getVel_x(), j.getCadencia()), 120, y);
-                y += 35;
-            }
-
-            g.setColor(Color.GRAY);
-            g.setFont(new Font("Arial", Font.PLAIN, 14));
-            g.drawString("W/S ou setas para navegar, Enter para confirmar", 230, y + 20);
+            menu.desenhar(g, larguraTela, alturaTela);
             return;
         }
 
@@ -167,7 +184,9 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         // Só atualiza posições e colisões enquanto não estiver no menu e não tiver dado Game Over
-        if (!noMenu && !motorJogo.isGameOver()) {
+        if (noMenu) {
+            menu.atualizar();
+        } else if (!motorJogo.isGameOver()) {
             motorJogo.atualizar();
         }
         repaint();
@@ -177,17 +196,7 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (noMenu) {
-            int total = TipoDeNave.values().length;
-
-            if (key == KeyEvent.VK_UP || key == KeyEvent.VK_W) {
-                opcaoSelecionada = (opcaoSelecionada - 1 + total) % total;
-            } else if (key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S) {
-                opcaoSelecionada = (opcaoSelecionada + 1) % total;
-            } else if (key == KeyEvent.VK_ENTER || key == KeyEvent.VK_SPACE) {
-                motorJogo.setNaveSelecionada(TipoDeNave.values()[opcaoSelecionada]);
-                motorJogo.inicializarJogo();
-                noMenu = false;
-            }
+            menu.teclaPressionada(key);
             return;
         }
         if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
@@ -210,6 +219,8 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         }
         if (key == KeyEvent.VK_M && motorJogo.isGameOver()) {
             noMenu = true;
+            menu.voltarAoInicio();
+            motor.GerenciadorSom.tocarMusica("sons/musica_fundo.wav");
         }
     }
 
