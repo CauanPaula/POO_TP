@@ -108,7 +108,8 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             switch (en.getTipoInimigo()) {
                 case 1 -> g.setColor(Color.ORANGE);
                 case 2 -> g.setColor(Color.MAGENTA);
-                default -> g.setColor(Color.RED);
+                case 3 -> g.setColor(Color.RED);
+                default -> g.setColor(Color.WHITE);
             }
             int x = (int) (en.getPos_x() - en.getTam_x());
             int y = (int) (en.getPos_y() - en.getTam_y());
@@ -161,6 +162,12 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             g.drawString(motorJogo.getScore().getNomePlayer() + " - Score Final: " + motorJogo.getScore().getScorePlayer(), 265, 310);
             g.drawString("Pressione R para reiniciar", 275, 350);
             g.drawString("Pressione M para voltar ao menu", 255, 380);
+        }
+
+        // 11. Cronometro dificuldade 
+        if (!motorJogo.isGameOver()){
+            g.drawString("Nível: " + motorJogo.getDificuldade(), 650, 30);
+            g.drawString("Próximo nível em: " + motorJogo.getTimer() + "s", 600, 55);
         }
     }
 

@@ -34,6 +34,13 @@ public class Jogo {
     private int enemySpawnTimer;
     private int buffSpawnTimer;
 
+    //Controladores do timer e dificuldade
+    private int nivelDeDificuldade;
+    private int timerDaDificuldade;
+    private int FPS = 60;
+    private int timer;
+    private int cronometroPosNivel3;
+
     public Jogo (int tamTelaX, int tamTelaY){
         this.enemies = new ArrayList<>();
         this.buffs = new ArrayList<>();
@@ -56,6 +63,11 @@ public class Jogo {
          motor.GerenciadorSom.tocarMusica("sons/musica_fundo.wav");
         this.score = new Score(0);
         score.setNomePlayer("Jogador 1"); 
+
+        this.nivelDeDificuldade = 1;
+        this.timerDaDificuldade = 5;
+        this.timer = this.FPS*5; //30s
+        this.cronometroPosNivel3 = 1;
 
         this.motorTiros = new GerenciadorTiros();
         this.motorColisoes = new GerenciadorColisoes();
@@ -88,6 +100,7 @@ public class Jogo {
         if (this.coolDownTiroJogador > 0) {this.coolDownTiroJogador--;}
 
         atualizarMovimentacaoDoJogador();
+        atualizarTimerDificuldade();
         gerarEAtualizarInimigos();
         gerarEAtualizarBuffs();
         atualizarTiros();
@@ -141,7 +154,7 @@ public class Jogo {
             Inimigo inimigo = inimigoIterator.next();
 
             inimigo.atualizarCooldown();
-            if (inimigo.getTipoInimigo() == 1 && inimigo.podeAtirar()){
+            if ((inimigo.getTipoInimigo() == 2 || inimigo.getTipoInimigo() == 1) && inimigo.podeAtirar()){
                 inimigo.disparar(motorTiros);
                 inimigo.resetarCooldown();
             }
@@ -149,32 +162,133 @@ public class Jogo {
 
     }
 
+    //Colocar essa função no atualizar
+    //Mudar dificuldade
+    public void atualizarTimerDificuldade(){
+        if (this.nivelDeDificuldade > 3){
+            this.cronometroPosNivel3++;
+            int cronometro = this.FPS*this.cronometroPosNivel3;
+            if (cronometro%60 == 0){
+                this.timer++;
+            }
+            if (this.timer%120 == 0){
+                this.nivelDeDificuldade++;
+            }
+        } else if (this.timer > 0){
+            this.timer--;
+        } else {
+            this.nivelDeDificuldade++;
+            this.timer = this.FPS*this.timerDaDificuldade;
+        }
+        
+    }
+
+    public int getTimer(){
+        return (int) Math.ceil((double) this.timer / FPS);
+    }
+    public int getDificuldade(){
+        return this.nivelDeDificuldade;
+    }
 
     public void gerarEAtualizarInimigos(){
         //Gerando  inimigos
         this.enemySpawnTimer++;
+        int limiteSpawn = Math.max(10, 40 - (this.nivelDeDificuldade * 4));
+        int dano;
 
-        if (this.enemySpawnTimer >= 40){
-            int tipoDeInimigo = random.nextInt(2)+1;
-            int vidaInimigo = tipoDeInimigo*4;
-            int dano;
-            double velY = (5 * tipoDeInimigo)/2;
-            if (tipoDeInimigo == 1){
-                dano = 1;
-            } else {
+        if (this.nivelDeDificuldade == 1){ //NIVEL 1 (Aparece apenas inimigos corpo a corpo)
+
+
+            if (this.enemySpawnTimer >= limiteSpawn){
+                int tipoDeInimigo = 3;
                 dano = 10;
+                int vidaInimigo = (tipoDeInimigo * 3) + this.nivelDeDificuldade;
+                double velY = 2.0 + (5 - tipoDeInimigo) + (this.nivelDeDificuldade * 0.5);
+
+                Inimigo novoInimigo = new Inimigo(vidaInimigo, dano, 0, velY, 1, tipoDeInimigo, 15, 15);
+
+                //Setar a posição do inimigo aleatoriamente no eixo X lidando com o nascimento nas bordas
+                double enemyX = 20 + random.nextInt(Math.max(1, this.tamanhoTelaX - 40));
+                novoInimigo.setPos_x(enemyX);
+                novoInimigo.setPos_y(0);
+
+                enemies.add(novoInimigo);
+                this.enemySpawnTimer = 0;
+            }
+        } else if (this.nivelDeDificuldade == 2){ ////NIVEL 2 (Aparece  inimigos corpo a corpo e atiradores)
+
+            this.timerDaDificuldade = 1; //1:00
+
+            if (this.enemySpawnTimer >= limiteSpawn){
+                int tipoDeInimigo = random.nextInt(2)+2; //Aparece inimigo do tipo 3 (corpo a corpo) e do tipo 2 (tiro por disparos)
+
+                int vidaInimigo = (tipoDeInimigo * 3) + this.nivelDeDificuldade;
+                double velY = 2.0 + (5 - tipoDeInimigo) + (this.nivelDeDificuldade * 0.5);
+                if (tipoDeInimigo == 2){
+                    dano = 1;
+                } else {
+                    dano = 10;
+                }
+
+                Inimigo novoInimigo = new Inimigo(vidaInimigo, dano, 0, velY, 2, tipoDeInimigo, 15, 15);
+
+                //Setar a posição do inimigo aleatoriamente no eixo X lidando com o nascimento nas bordas
+                double enemyX = 20 + random.nextInt(Math.max(1, this.tamanhoTelaX - 40));
+                novoInimigo.setPos_x(enemyX);
+                novoInimigo.setPos_y(0);
+
+                enemies.add(novoInimigo);
+                this.enemySpawnTimer = 0;
+            }
+        } else if (this.nivelDeDificuldade == 3) { //NIVEL 3 (Aparece  inimigos corpo a corpo e atiradores do tipo laser e por disparos)
+            this.timerDaDificuldade = 1; //2:00
+
+            if (this.enemySpawnTimer >= limiteSpawn){
+                int tipoDeInimigo = random.nextInt(3)+1; //Aparece inimigo do tipo 3 (corpo a corpo), do tipo 2 (tiro por disparos) e do tipo 1 (laser)
+
+                int vidaInimigo = (tipoDeInimigo * 3) + this.nivelDeDificuldade;
+                double velY = 2.0 + (5 - tipoDeInimigo) + (this.nivelDeDificuldade * 0.5);
+                if (tipoDeInimigo == 2 && tipoDeInimigo == 1){
+                    dano = 1;
+                } else {
+                    dano = 10;
+                }
+
+                Inimigo novoInimigo = new Inimigo(vidaInimigo, dano, 0, velY, 3, tipoDeInimigo, 15, 15);
+
+                //Setar a posição do inimigo aleatoriamente no eixo X lidando com o nascimento nas bordas
+                double enemyX = 20 + random.nextInt(Math.max(1, this.tamanhoTelaX - 40));
+                novoInimigo.setPos_x(enemyX);
+                novoInimigo.setPos_y(0);
+
+                enemies.add(novoInimigo);
+                this.enemySpawnTimer = 0;
             }
 
-            Inimigo novoInimigo = new Inimigo(vidaInimigo, dano, 0, velY, 1, tipoDeInimigo, 15, 15);
+        } else { // Agora todos os atributos dos inimigos são aumentados
+            if (this.enemySpawnTimer >= limiteSpawn){
+                int tipoDeInimigo = random.nextInt(3)+1; //Aparece inimigo do tipo 3 (corpo a corpo), do tipo 2 (tiro por disparos) e do tipo 1 (laser)
 
-            //Setar a posição do inimigo aleatoriamente no eixo X lidando com o nascimento nas bordas
-            double enemyX = 20 + random.nextInt(Math.max(1, this.tamanhoTelaX - 40));
-            novoInimigo.setPos_x(enemyX);
-            novoInimigo.setPos_y(0);
+                int vidaInimigo = (tipoDeInimigo * 3) + this.nivelDeDificuldade;
+                double velY = 2.0 + (5 - tipoDeInimigo) + (this.nivelDeDificuldade * 0.5);
+                if (tipoDeInimigo == 2 && tipoDeInimigo == 1){
+                    dano = 3;
+                } else {
+                    dano = 10;
+                }
 
-            enemies.add(novoInimigo);
-            this.enemySpawnTimer = 0;
+                Inimigo novoInimigo = new Inimigo(vidaInimigo, dano, 0, velY, 4, tipoDeInimigo, 15, 15);
+
+                //Setar a posição do inimigo aleatoriamente no eixo X lidando com o nascimento nas bordas
+                double enemyX = 20 + random.nextInt(Math.max(1, this.tamanhoTelaX - 40));
+                novoInimigo.setPos_x(enemyX);
+                novoInimigo.setPos_y(0);
+
+                enemies.add(novoInimigo);
+                this.enemySpawnTimer = 0;
+            }
         }
+   
 
         //Atualizar posição dos inimigos
         Iterator <Inimigo> inimigoIter = enemies.iterator();
