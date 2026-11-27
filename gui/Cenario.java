@@ -171,6 +171,17 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
         g.drawString("Dano: " + jogador.getDano(), 20, 80);
         g.drawString(String.format("Cadência: %.1f", jogador.getCadencia()), 20, 105);
 
+        // 10. Cronometro dificuldade 
+        g.setFont(new Font("Arial", Font.BOLD, 16));
+        g.drawString("Nível: " + motorJogo.getDificuldade(), 650, 30);
+        int[] tempo = motorJogo.getTimer();
+        String textoTimer = String.format("%02d:%02d", tempo[0], tempo[1]);
+        if (motorJogo.getDificuldade() > 3){
+            g.drawString("Tempo de Sobrevivência: " + textoTimer, 545, 55);
+        } else {
+            g.drawString("Próximo nível em: " + textoTimer, 580, 55);
+        }
+
         // 11. Desenhar barra de vida do Boss na parte inferior
         if (boss != null) {
             int larguraBarra = 300;
@@ -204,17 +215,10 @@ public class Cenario extends JPanel implements ActionListener, KeyListener {
             g.drawString(motorJogo.getScore().getNomePlayer() + " - Score Final: " + motorJogo.getScore().getScorePlayer(), 265, 310);
             g.drawString("Pressione R para reiniciar", 275, 350);
             g.drawString("Pressione M para voltar ao menu", 255, 380);
+            
         }
 
-        // 11. Cronometro dificuldade 
-        if (!motorJogo.isGameOver()){
-            g.drawString("Nível: " + motorJogo.getDificuldade(), 650, 30);
-            if (motorJogo.getDificuldade() > 3){
-                g.drawString("Tempo de Sobrevivência: " + motorJogo.getTimer() + "s", 565, 55);
-            } else {
-                g.drawString("Próximo nível em: " + motorJogo.getTimer() + "s", 600, 55);
-            }
-        }
+        
     }
 
     @Override
